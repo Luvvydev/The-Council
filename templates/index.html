@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The Council</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #2b2b40 0%, #050511 55%, #000000 100%);
+      color: #f5f5f5;
+    }
+
+    .page {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      box-sizing: border-box;
+    }
+
+    .panel {
+      width: 100%;
+      max-width: 980px;
+      background: rgba(5, 5, 15, 0.96);
+      border-radius: 18px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(120, 120, 200, 0.45);
+      backdrop-filter: blur(10px);
+      padding: 24px 28px 28px 28px;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: -80px;
+      background:
+        radial-gradient(circle at top left, rgba(120, 120, 255, 0.16), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(255, 120, 120, 0.12), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .panel-inner {
+      position: relative;
+      z-index: 1;
+    }
+
+    .title {
+      font-size: 32px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-align: center;
+      margin-bottom: 4px;
+      cursor: pointer;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #a5a5d0;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .question-row {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .label {
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #b0b0de;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 90px;
+      resize: vertical;
+      background: rgba(10, 10, 26, 0.95);
+      border: 1px solid rgba(160, 160, 240, 0.4);
+      border-radius: 10px;
+      color: #f5f5ff;
+      padding: 12px 14px;
+      font-size: 14px;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    textarea:focus {
+      border-color: #b6b6ff;
+      box-shadow: 0 0 0 1px rgba(160, 160, 255, 0.5);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #8686b0;
+    }
+
+    button {
+      border: none;
+      background: radial-gradient(circle at top left, #5959ff, #2424aa);
+      color: #fdfdff;
+      padding: 10px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 0 12px rgba(90, 90, 255, 0.7);
+      white-space: nowrap;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .result {
+      margin-top: 18px;
+      border-top: 1px solid rgba(130, 130, 200, 0.4);
+      padding-top: 16px;
+    }
+
+    .winner {
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: radial-gradient(circle at left, rgba(140, 140, 255, 0.2), transparent 70%);
+      border: 1px solid rgba(175, 175, 255, 0.6);
+    }
+
+    .winner-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .winner-badge {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #bfbfff;
+      margin-bottom: 4px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    th, td {
+      border: 1px solid rgba(90, 90, 150, 0.75);
+      padding: 7px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(20, 20, 50, 0.9);
+      font-weight: 500;
+    }
+
+    tr:nth-child(even) td {
+      background: rgba(10, 10, 30, 0.85);
+    }
+
+    tr:nth-child(odd) td {
+      background: rgba(13, 13, 34, 0.92);
+    }
+
+    .opt-id {
+      font-weight: 600;
+      color: #d0d0ff;
+      width: 42px;
+      text-align: center;
+    }
+
+    .avg-cell {
+      font-weight: 600;
+      color: #ffe8a0;
+      text-align: center;
+      width: 70px;
+    }
+
+    .agent-cell {
+      text-align: center;
+      width: 70px;
+    }
+    .agent-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .agent-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      object-fit: cover;
+      border: 1px solid rgba(200, 200, 255, 0.7);
+      box-shadow: 0 0 6px rgba(140, 140, 255, 0.5);
+      flex-shrink: 0;
+    }
+
+    .agent-name {
+      font-size: 11px;
+      line-height: 1.2;
+    }
+
+
+    .summary-cell {
+      max-width: 380px;
+    }
+
+    .error {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #ff9f9f;
+    }
+
+    .loading {
+      font-size: 12px;
+      color: #bfbfff;
+      margin-left: 8px;
+    }
+
+    @media (max-width: 720px) {
+      .panel {
+        padding: 18px 16px 20px 16px;
+      }
+      .title {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="panel">
+      <div class="panel-inner">
+        <div class="title">The Council</div>
+        <div class="subtitle">Ask the council for deliberation</div>
+
+        <form id="questionForm">
+          <div class="question-row">
+            <div class="label">Question for the council</div>
+            <textarea id="question" placeholder="Describe your situation or decision. The council will propose options and vote."></textarea>
+          </div>
+
+          <div class="controls">
+            <div class="hint">
+              The council will propose one path per member and score every path from 0 to 100.
+            </div>
+            <div>
+              <button id="submitBtn" type="submit">
+                Convene the council
+              </button>
+              <span id="loading" class="loading" style="display:none;">
+                Gathering voices...
+              </span>
+            </div>
+          </div>
+          <div id="error" class="error" style="display:none;"></div>
+        </form>
+
+        <div id="result" class="result" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById("questionForm");
+    const questionInput = document.getElementById("question");
+    const submitBtn = document.getElementById("submitBtn");
+    const loadingEl = document.getElementById("loading");
+    const errorEl = document.getElementById("error");
+    const resultEl = document.getElementById("result");
+
+    const titleEl = document.querySelector(".title");
+    if (titleEl) {
+      titleEl.addEventListener("click", () => {
+        questionInput.value = "";
+        errorEl.style.display = "none";
+        resultEl.style.display = "none";
+        resultEl.innerHTML = "";
+      });
+    }
+
+
+    form.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      askCouncil();
+    });
+
+    async function askCouncil() {
+      const question = questionInput.value.trim();
+      errorEl.style.display = "none";
+      resultEl.style.display = "none";
+
+      if (!question) {
+        errorEl.textContent = "Please write a question for the council.";
+        errorEl.style.display = "block";
+        return;
+      }
+
+      submitBtn.disabled = true;
+      loadingEl.style.display = "inline";
+
+      try {
+        const response = await fetch("/api/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question })
+        });
+
+        if (!response.ok) {
+          const err = await response.json().catch(() => ({}));
+          const msg = err.error || "Council failed to respond.";
+          throw new Error(msg);
+        }
+
+        const data = await response.json();
+        renderResult(data);
+      } catch (err) {
+        errorEl.textContent = err.message || "Something went wrong.";
+        errorEl.style.display = "block";
+      } finally {
+        submitBtn.disabled = false;
+        loadingEl.style.display = "none";
+      }
+    }
+
+    function renderResult(data) {
+      const { agents, options, winner_id } = data;
+      resultEl.innerHTML = "";
+
+      if (!options || options.length === 0) {
+        resultEl.textContent = "The council gave no answer.";
+        resultEl.style.display = "block";
+        return;
+      }
+
+      const winner = options.find(o => o.id === winner_id) || options[0];
+
+      const winnerBox = document.createElement("div");
+      winnerBox.className = "winner";
+
+      const badge = document.createElement("div");
+      badge.className = "winner-badge";
+      badge.textContent = "Council choice";
+      winnerBox.appendChild(badge);
+
+      const title = document.createElement("div");
+      title.className = "winner-title";
+      title.textContent = winner.title + "  (score " + winner.average_score.toFixed(1) + ")";
+      winnerBox.appendChild(title);
+
+      const summary = document.createElement("div");
+      summary.textContent = winner.summary;
+      winnerBox.appendChild(summary);
+
+      resultEl.appendChild(winnerBox);
+
+      const tableWrap = document.createElement("div");
+      tableWrap.className = "table-wrap";
+
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+
+      const hOpt = document.createElement("th");
+      hOpt.textContent = "Option";
+      headerRow.appendChild(hOpt);
+
+      const hTitle = document.createElement("th");
+      hTitle.textContent = "Title and summary";
+      headerRow.appendChild(hTitle);
+
+      agents.forEach(agent => {
+        const th = document.createElement("th");
+        const wrap = document.createElement("div");
+        wrap.className = "agent-header";
+
+        if (agent.image) {
+          const img = document.createElement("img");
+          img.className = "agent-avatar";
+          img.src = agent.image;
+          img.alt = agent.name;
+          wrap.appendChild(img);
+        }
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "agent-name";
+        nameSpan.textContent = agent.name;
+        wrap.appendChild(nameSpan);
+
+        th.appendChild(wrap);
+        headerRow.appendChild(th);
+      });
+
+      const hAvg = document.createElement("th");
+      hAvg.textContent = "Average";
+      headerRow.appendChild(hAvg);
+
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+
+      options.forEach(opt => {
+        const row = document.createElement("tr");
+
+        const idCell = document.createElement("td");
+        idCell.className = "opt-id";
+        idCell.textContent = opt.id;
+        row.appendChild(idCell);
+
+        const summaryCell = document.createElement("td");
+        summaryCell.className = "summary-cell";
+        const t = document.createElement("div");
+        t.style.fontWeight = "600";
+        t.textContent = opt.title + "  (by " + opt.proposed_by + ")";
+        const s = document.createElement("div");
+        s.textContent = opt.summary;
+        summaryCell.appendChild(t);
+        summaryCell.appendChild(s);
+        row.appendChild(summaryCell);
+
+        agents.forEach(agent => {
+          const cell = document.createElement("td");
+          cell.className = "agent-cell";
+          const scoreMap = opt.scores || {};
+          const v = scoreMap[agent.name];
+          cell.textContent = v !== undefined ? v.toFixed(1) : "–";
+          row.appendChild(cell);
+        });
+
+        const avgCell = document.createElement("td");
+        avgCell.className = "avg-cell";
+        avgCell.textContent = opt.average_score.toFixed(1);
+        row.appendChild(avgCell);
+
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      tableWrap.appendChild(table);
+      resultEl.appendChild(tableWrap);
+
+      resultEl.style.display = "block";
+    }
+  </script>
+</body>
+</html>
