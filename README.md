@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="council.png" alt="World council of ten shadowed members at a glowing table deciding the fate of the world" width="400">
+  <img src="council.png" alt="World council of ten shadowed members at a glowing table deciding the fate of the world" width="500">
 </p>
 
 
