@@ -46,3 +46,15 @@ source .venv/bin/activate
 
 python3 -m pip install --upgrade pip
 python3 -m pip install flask openai
+```
+
+
+## Set your API key in app.py
+
+`API_KEY = "YOUR_API_KEY_HERE"`
+
+Replace the placeholder with your real key.
+
+## Start the app:
+
+`python3 app.py`
