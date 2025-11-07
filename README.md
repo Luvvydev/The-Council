@@ -1,6 +1,13 @@
 <p align="center">
   <img src="council.png" alt="World council of ten shadowed members at a glowing table deciding the fate of the world" width="500">
 </p>
+<p align="center">
+  <img src="council2.png" alt="World council of ten shadowed members at a glowing table deciding the fate of the world" width="500">
+</p>
+<p align="center">
+  <img src="council3.png" alt="World council of ten shadowed members at a glowing table deciding the fate of the world" width="500">
+</p>
+
 
 
 # The Council
